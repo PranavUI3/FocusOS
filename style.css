@@ -1,8 +1,1367 @@
-*{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    background-color: #f4f7f6;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --surface-alt: #f7fafb;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --primary-soft: #e3f1f3;
+  --success: #2e8b57;
+  --danger: #c0392b;
+  --warning: #d98e04;
+  --border: #dde5e8;
+  --shadow: 0 1px 3px rgba(20, 40, 50, 0.06);
+  --shadow-hover: 0 4px 12px rgba(20, 40, 50, 0.1);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11181b;
+    --surface: #1a2428;
+    --surface-alt: #202c31;
+    --text: #e6eef0;
+    --muted: #93a5ac;
+    --primary: #3fb0bf;
+    --primary-dark: #62c4d1;
+    --primary-soft: #1d3a40;
+    --success: #4cc38a;
+    --danger: #ef6f60;
+    --warning: #f0b030;
+    --border: #2c3a40;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+
+/* ============ 2. BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text);
+}
+
+.text-muted {
+  color: var(--muted) !important;
+}
+
+
+/* ============ 3. NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+  box-shadow: var(--shadow);
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.app-navbar .navbar-text {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+
+/* ============ 4. CARDS ============ */
+.card {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+main > section.card,
+.col-lg-6 > section.card {
+  transition: box-shadow 0.2s ease;
+}
+
+.col-lg-6 > section.card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+
+/* ============ 5. METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ============ 6. BUTTONS ============ */
+.btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  color: #ffffff;
+}
+
+.btn-outline-secondary {
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--surface-alt);
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+.btn-outline-danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--danger);
+  border-color: var(--danger);
+  color: #ffffff;
+}
+
+.btn:disabled,
+.btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ============ 7. FORMS ============ */
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-control,
+.form-select {
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.form-control::placeholder {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.input-group .form-control,
+.input-group .form-select {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.input-group .btn {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+
+/* ============ 8. FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  color: var(--primary);
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+/* JS adds these classes to #timerDisplay */
+.timer-display.running {
+  color: var(--success);
+}
+
+.timer-display.paused {
+  color: var(--warning);
+}
+
+.timer-display.finished {
+  color: var(--danger);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+  border-radius: 20px;
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+
+/* ============ 9. JOURNAL ============ */
+#journalCard .form-label {
+  color: var(--primary);
+}
+
+#journalSavedMsg {
+  font-weight: 500;
+}
+
+
+/* ============ 10. TASK PLANNER ============ */
+#taskList,
+#distractionList {
+  max-height: 280px;
+  overflow-y: auto;
+  border-radius: var(--radius-sm);
+}
+
+.list-group-item {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+}
+
+.list-group-item:hover {
+  background-color: var(--surface-alt);
+}
+
+/* Task row layout (JS builds: checkbox + .task-text + delete button) */
+.task-item .form-check-input {
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.task-item .form-check-input:checked {
+  background-color: var(--success);
+  border-color: var(--success);
+}
+
+.task-text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+}
+
+.btn-delete:hover {
+  color: var(--danger);
+  background-color: rgba(192, 57, 43, 0.1);
+}
+
+
+/* ============ 11. DISTRACTION LOGGER ============ */
+.distraction-item .badge {
+  font-weight: 500;
+  padding: 0.4em 0.7em;
+  border-radius: 20px;
+  background-color: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.distraction-time {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ============ 12. ANALYTICS ============ */
+
+/* Subject breakdown bars */
+.subject-row {
+  margin-bottom: 1rem;
+}
+
+.subject-row .subject-name {
+  font-weight: 500;
+}
+
+.subject-row .subject-time {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.subject-row .progress {
+  height: 8px;
+  margin-top: 0.3rem;
+}
+
+/* Weekly heatmap: JS makes 7 .heat-cell items */
+#weeklyHeatmap {
+  flex-wrap: nowrap;
+}
+
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.9rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  transition: transform 0.15s ease;
+}
+
+.heat-cell:hover {
+  transform: translateY(-2px);
+}
+
+.heat-cell .heat-day {
+  display: block;
+  font-weight: 600;
+}
+
+.heat-cell .heat-value {
+  display: block;
+  font-size: 0.72rem;
+  margin-top: 0.2rem;
+  opacity: 0.85;
+}
+
+.heat-cell.today {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Intensity levels: 0 = none, 4 = most studied */
+.heat-1 { background-color: #c5e0e4; border-color: #c5e0e4; color: #1f2d33; }
+.heat-2 { background-color: #8fc3cb; border-color: #8fc3cb; color: #1f2d33; }
+.heat-3 { background-color: #4f9ba6; border-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; border-color: #1d6f7a; color: #ffffff; }
+
+
+/* ============ 13. UTILITIES AND STATES ============ */
+.empty-state {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+/* Thin scrollbars for the lists */
+#taskList::-webkit-scrollbar,
+#distractionList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#taskList::-webkit-scrollbar-thumb,
+#distractionList::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 10px;
+}
+
+/* Small pop when JS adds a new item */
+.item-added {
+  animation: itemIn 0.25s ease;
+}
+
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============ 14. RESPONSIVE ============ */
+@media (max-width: 991.98px) {
+  .timer-display {
+    font-size: 4rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
+  }
+
+  .metric-label {
+    font-size: 0.78rem;
+  }
+
+  .heat-cell {
+    padding: 0.7rem 0.1rem;
+    font-size: 0.7rem;
+  }
+
+  .heat-cell .heat-value {
+    font-size: 0.62rem;
+  }/* ============ VARIABLES ============ */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --border: #dde5e8;
+  --radius: 10px;
+}
+
+/* ============ BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+/* ============ NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ============ METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ============ FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  transition: width 0.4s ease;
+}
+
+/* ============ FORMS ============ */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ============ TASK LIST (used by JS later) ============ */
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.list-group-item {
+  border-color: var(--border);
+}
+
+/* ============ SUBJECT BREAKDOWN (used by JS later) ============ */
+.subject-row {
+  margin-bottom: 0.9rem;
+}
+
+.subject-row .progress {
+  height: 8px;
+}
+
+/* ============ WEEKLY HEATMAP (used by JS later) ============ */
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: #e8eef0;
+}
+
+.heat-1 { background-color: #c5e0e4; }
+.heat-2 { background-color: #8fc3cb; }
+.heat-3 { background-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; color: #ffffff; }
+
+/* ============ SMALL SCREENS ============ *//* ============ VARIABLES ============ */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --border: #dde5e8;
+  --radius: 10px;
+}
+
+/* ============ BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+/* ============ NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ============ METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ============ FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  transition: width 0.4s ease;
+}
+
+/* ============ FORMS ============ */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ============ TASK LIST (used by JS later) ============ */
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.list-group-item {
+  border-color: var(--border);
+}/* ============ VARIABLES ============ */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --border: #dde5e8;
+  --radius: 10px;
+}
+
+/* ============ BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+/* ============ NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ============ METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ============ FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  transition: width 0.4s ease;
+}
+
+/* ============ FORMS ============ */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ============ TASK LIST (used by JS later) ============ */
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.list-group-item {
+  border-color: var(--border);
+}
+
+/* ============ SUBJECT BREAKDOWN (used by JS later) ============ */
+.subject-row {
+  margin-bottom: 0.9rem;
+}
+
+.subject-row .progress {
+  height: 8px;
+}
+
+/* ============ WEEKLY HEATMAP (used by JS later) ============ */
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;/* ============ VARIABLES ============ */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --border: #dde5e8;
+  --radius: 10px;
+}
+
+/* ============ BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+/* ============ NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ============ METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ============ FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  transition: width 0.4s ease;
+}
+
+/* ============ FORMS ============ */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ============ TASK LIST (used by JS later) ============ */
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.list-group-item {
+  border-color: var(--border);
+}
+
+/* ============ SUBJECT BREAKDOWN (used by JS later) ============ */
+.subject-row {
+  margin-bottom: 0.9rem;
+}
+
+.subject-row .progress {
+  height: 8px;
+}
+
+/* ============ WEEKLY HEATMAP (used by JS later) ============ */
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: #e8eef0;
+}
+
+.heat-1 { background-color: #c5e0e4; }
+.heat-2 { background-color: #8fc3cb; }
+.heat-3 { background-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; color: #ffffff; }
+
+/* ============ SMALL SCREENS ============ *//* ============ VARIABLES ============ */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --border: #dde5e8;
+  --radius: 10px;
+}
+
+/* ============ BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+/* ============ NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ============ METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ============ FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  transition: width 0.4s ease;
+}
+
+/* ============ FORMS ============ */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ============ TASK LIST (used by JS later) ============ */
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.list-group-item {
+  border-color: var(--border);
+}
+
+/* ============ SUBJECT BREAKDOWN (used by JS later) ============ */
+.subject-row {
+  margin-bottom: 0.9rem;
+}
+
+.subject-row .progress {
+  height: 8px;
+}
+
+/* ============ WEEKLY HEATMAP (used by JS later) ============ */
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: #e8eef0;
+}/* ============ VARIABLES ============ */
+:root {
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --text: #1f2d33;
+  --muted: #667780;
+  --primary: #1d6f7a;
+  --primary-dark: #155861;
+  --border: #dde5e8;
+  --radius: 10px;
+}
+
+/* ============ BASE ============ */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+/* ============ NAVBAR ============ */
+.app-navbar {
+  background-color: var(--primary);
+  padding: 0.8rem 0;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .navbar-text {
+  color: #ffffff;
+}
+
+.app-navbar .navbar-brand {
+  font-weight: 600;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ============ METRIC CARDS ============ */
+.metric-card {
+  border-left: 4px solid var(--primary);
+}
+
+.metric-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* ============ FOCUS TIMER ============ */
+.timer-display {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary);
+}
+
+.progress {
+  height: 10px;
+  background-color: var(--border);
+}
+
+.progress-bar {
+  background-color: var(--primary);
+  transition: width 0.4s ease;
+}
+
+/* ============ FORMS ============ */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem rgba(29, 111, 122, 0.2);
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+/* ============ TASK LIST (used by JS later) ============ */
+.task-done .task-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.list-group-item {
+  border-color: var(--border);
+}
+
+/* ============ SUBJECT BREAKDOWN (used by JS later) ============ */
+.subject-row {
+  margin-bottom: 0.9rem;
+}
+
+.subject-row .progress {
+  height: 8px;
+}
+
+/* ============ WEEKLY HEATMAP (used by JS later) ============ */
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: #e8eef0;
+}
+
+.heat-1 { background-color: #c5e0e4; }
+.heat-2 { background-color: #8fc3cb; }
+.heat-3 { background-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; color: #ffffff; }
+
+/* ============ SMALL SCREENS ============ */
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+
+.heat-1 { background-color: #c5e0e4; }
+.heat-2 { background-color: #8fc3cb; }
+.heat-3 { background-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; color: #ffffff; }
+
+/* ============ SMALL SCREENS ============ */
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: #e8eef0;
+}
+
+.heat-1 { background-color: #c5e0e4; }
+.heat-2 { background-color: #8fc3cb; }
+.heat-3 { background-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; color: #ffffff; }
+
+/* ============ SMALL SCREENS ============ */
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+
+/* ============ SUBJECT BREAKDOWN (used by JS later) ============ */
+.subject-row {
+  margin-bottom: 0.9rem;
+}
+
+.subject-row .progress {
+  height: 8px;
+}
+
+/* ============ WEEKLY HEATMAP (used by JS later) ============ */
+.heat-cell {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 0.2rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  background-color: #e8eef0;
+}
+
+.heat-1 { background-color: #c5e0e4; }
+.heat-2 { background-color: #8fc3cb; }
+.heat-3 { background-color: #4f9ba6; color: #ffffff; }
+.heat-4 { background-color: #1d6f7a; color: #ffffff; }
+
+/* ============ SMALL SCREENS ============ */
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+@media (max-width: 576px) {
+  .timer-display {
+    font-size: 3rem;
+  }
+
+  .metric-value {
+    font-size: 1.3rem;
+  }
+}
+}
+
+
+/* ============ 15. ACCESSIBILITY ============ */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
