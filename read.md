@@ -59,3 +59,5 @@ focus-os/
 ├── style.css           # Custom CSS styling, shadows, and layout enhancements
 ├── script.js           # Core application logic, timer engine, and LocalStorage handlers
 └── README.md           # Project documentation
+About
+￼
