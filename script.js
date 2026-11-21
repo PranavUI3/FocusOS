@@ -1,411 +1,247 @@
-// LocalStorage Keys
-const STORAGE_KEYS = {
-  SESSIONS: "focusos_sessions",
-  TASKS: "focusos_tasks",
-  DISTRACTIONS: "focusos_distractions",
-  REFLECTIONS: "focusos_reflections",
+const KEYS = {
+  sessions: "focusos_sessions",
+  tasks: "focusos_tasks",
+  distractions: "focusos_distractions",
+  reflections: "focusos_reflections"
 };
 
-// Application State
-let timerInterval = null;
-let totalSeconds = 25 * 60;
-let remainingSeconds = totalSeconds;
-let isRunning = false;
+let timerId = null;
+let totalSecs = 25 * 60;
+let leftSecs = totalSecs;
 
-// Initialize App on DOM Load
+const today = () => new Date().toISOString().split("T")[0];
+const getData = (k) => JSON.parse(localStorage.getItem(k)) || [];
+const setData = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
 document.addEventListener("DOMContentLoaded", () => {
-  displayTodayDate();
-  loadTasks();
-  loadDistractions();
-  loadReflections();
-  updateMetrics();
-  renderAnalytics();
-  setupEventListeners();
+  document.getElementById("todayDate").textContent = new Date().toLocaleDateString("en-US", {
+    weekday: "short", month: "short", day: "numeric"
+  });
+
+  document.getElementById("durationInput").addEventListener("change", () => {
+    if (!timerId) resetTimer();
+  });
+
+  document.getElementById("startBtn").addEventListener("click", startTimer);
+  document.getElementById("pauseBtn").addEventListener("click", pauseTimer);
+  document.getElementById("resetBtn").addEventListener("click", resetTimer);
+  document.getElementById("addTaskBtn").addEventListener("click", addTask);
+  document.getElementById("logDistractionBtn").addEventListener("click", logDistraction);
+  document.getElementById("saveJournalBtn").addEventListener("click", saveReflection);
+
+  updateTimerUI();
+  renderAll();
 });
 
-// 1. Display Today's Date in Navbar
-function displayTodayDate() {
-  const options = { weekday: "short", month: "short", day: "numeric" };
-  const today = new Date().toLocaleDateString("en-US", options);
-  document.getElementById("todayDate").textContent = today;
-}
-// 2. FOCUS TIMER ENGINE
-function setupEventListeners() {
-  const durationInput = document.getElementById("durationInput");
-  const timerDisplay = document.getElementById("timerDisplay");
-  const startBtn = document.getElementById("startBtn");
-  const pauseBtn = document.getElementById("pauseBtn");
-  const resetBtn = document.getElementById("resetBtn");
-
-  // Update timer display when user changes input duration
-  durationInput.addEventListener("change", () => {
-    if (!isRunning) {
-      const mins = parseInt(durationInput.value) || 25;
-      totalSeconds = mins * 60;
-      remainingSeconds = totalSeconds;
-      updateTimerDisplay();
-    }
-  });
-
-  startBtn.addEventListener("click", startTimer);
-  pauseBtn.addEventListener("click", pauseTimer);
-  resetBtn.addEventListener("click", resetTimer);
-
-  // Task Planner
-  document.getElementById("addTaskBtn").addEventListener("click", addTask);
-  document.getElementById("taskInput").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") addTask();
-  });
-
-  // Distraction Logger
-  document
-    .getElementById("logDistractionBtn")
-    .addEventListener("click", logDistraction);
-
-  // Journal
-  document
-    .getElementById("saveJournalBtn")
-    .addEventListener("click", saveReflection);
+function renderAll() {
+  renderTasks();
+  renderDistractions();
+  loadReflection();
+  updateMetrics();
+  renderAnalytics();
 }
 
-function updateTimerDisplay() {
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = remainingSeconds % 60;
-  const displayString = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  document.getElementById("timerDisplay").textContent = displayString;
+// --- FOCUS TIMER ---
+function updateTimerUI() {
+  const m = String(Math.floor(leftSecs / 60)).padStart(2, "0");
+  const s = String(leftSecs % 60).padStart(2, "0");
+  document.getElementById("timerDisplay").textContent = `${m}:${s}`;
 
-  // Update progress bar
-  const progressPercent =
-    ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
-  const progressBar = document.getElementById("timerProgress");
-  progressBar.style.width = `${progressPercent}%`;
-  progressBar.setAttribute("aria-valuenow", progressPercent);
+  const pct = ((totalSecs - leftSecs) / totalSecs) * 100;
+  document.getElementById("timerProgress").style.width = `${pct}%`;
 }
 
 function startTimer() {
+  if (timerId) return;
   const subject = document.getElementById("subjectSelect").value;
-  if (!subject) {
-    alert("Please choose a subject before starting the focus timer!");
-    return;
-  }
+  if (!subject) return alert("Choose a subject first.");
 
-  if (isRunning) return;
-  isRunning = document.getElementById("durationInput").disabled = true;
-
-  timerInterval = setInterval(() => {
-    if (remainingSeconds > 0) {
-      remainingSeconds--;
-      updateTimerDisplay();
+  document.getElementById("durationInput").disabled = true;
+  timerId = setInterval(() => {
+    if (leftSecs > 0) {
+      leftSecs--;
+      updateTimerUI();
     } else {
-      clearInterval(timerInterval);
-      isRunning = false;
+      clearInterval(timerId);
+      timerId = null;
       document.getElementById("durationInput").disabled = false;
 
-      // Save completed session
-      const durationMins = Math.round(totalSeconds / 60);
-      saveSessionRecord(subject, durationMins);
-      alert(
-        `🎉 Great job! Focus session for ${subject} (${durationMins} mins) completed and logged.`,
-      );
+      const mins = Math.max(1, Math.round(totalSecs / 60));
+      const sessions = getData(KEYS.sessions);
+      sessions.push({ subject, mins, date: today() });
+      setData(KEYS.sessions, sessions);
+
+      alert(`Completed ${mins}m in ${subject}!`);
       resetTimer();
+      updateMetrics();
+      renderAnalytics();
     }
   }, 1000);
 }
 
 function pauseTimer() {
-  clearInterval(timerInterval);
-  isRunning = false;
+  clearInterval(timerId);
+  timerId = null;
   document.getElementById("durationInput").disabled = false;
 }
 
 function resetTimer() {
-  clearInterval(timerInterval);
-  isRunning = false;
-  document.getElementById("durationInput").disabled = false;
-  const mins = parseInt(document.getElementById("durationInput").value) || 25;
-  totalSeconds = mins * 60;
-  remainingSeconds = totalSeconds;
-  updateTimerDisplay();
+  pauseTimer();
+  const mins = Math.min(180, Math.max(1, Number(document.getElementById("durationInput").value) || 25));
+  totalSecs = mins * 60;
+  leftSecs = totalSecs;
+  updateTimerUI();
 }
 
-function saveSessionRecord(subject, duration) {
-  const sessions =
-    JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSIONS)) || [];
-  sessions.push({
-    id: Date.now(),
-    subject: subject,
-    duration: duration,
-    date: new Date().toISOString().split("T")[0],
-  });
-  localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(sessions));
-  updateMetrics();
-  renderAnalytics();
-}
-// 3. TASK PLANNER LOGIC
-function getStoredData(key) {
-  return JSON.parse(localStorage.getItem(key)) || [];
-}
-
-function setStoredData(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
+// --- TASKS ---
 function addTask() {
   const input = document.getElementById("taskInput");
   const text = input.value.trim();
   if (!text) return;
 
-  const tasks = getStoredData(STORAGE_KEYS.TASKS);
-  tasks.push({ id: Date.now(), text: text, completed: false });
-  setStoredData(STORAGE_KEYS.TASKS, tasks);
-
+  const tasks = getData(KEYS.tasks);
+  tasks.push({ id: Date.now(), text, done: false });
+  setData(KEYS.tasks, tasks);
   input.value = "";
-  loadTasks();
-  updateMetrics();
-}
-
-function loadTasks() {
-  const tasks = getStoredData(STORAGE_KEYS.TASKS);
-  const taskList = document.getElementById("taskList");
-  const taskEmpty = document.getElementById("taskEmpty");
-
-  taskList.innerHTML = "";
-  if (tasks.length === 0) {
-    taskEmpty.classList.remove("d-none");
-  } else {
-    taskEmpty.classList.add("d-none");
-    tasks.forEach((task) => {
-      const li = document.createElement("li");
-      li.className =
-        "list-group-item d-flex justify-content-between align-items-center";
-      li.innerHTML = `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="task-${task.id}" ${task.completed ? "checked" : ""} onclick="toggleTask(${task.id})">
-                    <label class="form-check-label ${task.completed ? "text-decoration-line-through text-muted" : ""}" for="task-${task.id}">
-                        ${escapeHTML(task.text)}
-                    </label>
-                </div>
-                <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteTask(${task.id})"><i class="bi bi-trash"></i></button>
-            `;
-      taskList.appendChild(li);
-    });
-  }
+  renderTasks();
   updateMetrics();
 }
 
 function toggleTask(id) {
-  let tasks = getStoredData(STORAGE_KEYS.TASKS);
-  tasks = tasks.map((t) =>
-    t.id === id ? { ...t, completed: !t.completed } : t,
-  );
-  setStoredData(STORAGE_KEYS.TASKS, tasks);
-  loadTasks();
+  const tasks = getData(KEYS.tasks).map((t) => (t.id === id ? { ...t, done: !t.done } : t));
+  setData(KEYS.tasks, tasks);
+  renderTasks();
+  updateMetrics();
 }
 
 function deleteTask(id) {
-  let tasks = getStoredData(STORAGE_KEYS.TASKS);
-  tasks = tasks.filter((t) => t.id !== id);
-  setStoredData(STORAGE_KEYS.TASKS, tasks);
-  loadTasks();
+  const tasks = getData(KEYS.tasks).filter((t) => t.id !== id);
+  setData(KEYS.tasks, tasks);
+  renderTasks();
+  updateMetrics();
 }
-// 4. DISTRACTION LOGGER LOGIC
+
+function renderTasks() {
+  const tasks = getData(KEYS.tasks);
+  const list = document.getElementById("taskList");
+  document.getElementById("taskEmpty").classList.toggle("d-none", tasks.length > 0);
+
+  list.innerHTML = tasks.map((t) => `
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" ${t.done ? "checked" : ""} onchange="toggleTask(${t.id})">
+        <label class="form-check-label ${t.done ? "text-decoration-line-through text-muted" : ""}">${t.text}</label>
+      </div>
+      <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i></button>
+    </li>
+  `).join("");
+}
+
+// --- DISTRACTIONS ---
 function logDistraction() {
   const category = document.getElementById("distractionCategory").value;
-  const distractions = getStoredData(STORAGE_KEYS.DISTRACTIONS);
-
-  distractions.push({
-    id: Date.now(),
-    category: category,
-    date: new Date().toISOString().split("T")[0],
-    time: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+  const items = getData(KEYS.distractions);
+  items.push({
+    category,
+    date: today(),
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   });
-
-  setStoredData(STORAGE_KEYS.DISTRACTIONS, distractions);
-  loadDistractions();
+  setData(KEYS.distractions, items);
+  renderDistractions();
   updateMetrics();
 }
 
-function loadDistractions() {
-  const distractions = getStoredData(STORAGE_KEYS.DISTRACTIONS);
+function renderDistractions() {
+  const todayItems = getData(KEYS.distractions).filter((d) => d.date === today());
   const list = document.getElementById("distractionList");
-  const empty = document.getElementById("distractionEmpty");
+  document.getElementById("distractionEmpty").classList.toggle("d-none", todayItems.length > 0);
 
-  const todayStr = new Date().toISOString().split("T")[0];
-  const todayDistractions = distractions.filter((d) => d.date === todayStr);
-
-  list.innerHTML = "";
-  if (todayDistractions.length === 0) {
-    empty.classList.remove("d-none");
-  } else {
-    empty.classList.add("d-none");
-    todayDistractions
-      .slice(-5)
-      .reverse()
-      .forEach((d) => {
-        const li = document.createElement("li");
-        li.className =
-          "list-group-item d-flex justify-content-between align-items-center py-2";
-        li.innerHTML = `
-                <span><i class="bi bi-exclamation-circle text-warning me-2"></i>${escapeHTML(d.category)}</span>
-                <span class="text-muted small">${d.time}</span>
-            `;
-        list.appendChild(li);
-      });
-  }
-  updateMetrics();
+  list.innerHTML = todayItems.slice(-5).reverse().map((d) => `
+    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+      <span><i class="bi bi-exclamation-circle text-warning me-2"></i>${d.category}</span>
+      <span class="text-muted small">${d.time}</span>
+    </li>
+  `).join("");
 }
-// 5. DAILY REFLECTION JOURNAL LOGIC
+
+// --- REFLECTION ---
 function saveReflection() {
   const learned = document.getElementById("learnedInput").value.trim();
   const confused = document.getElementById("confusedInput").value.trim();
   const improve = document.getElementById("improveInput").value.trim();
+  if (!learned && !confused && !improve) return alert("Write at least one reflection point.");
 
-  if (!learned && !confused && !improve) {
-    alert("Please fill out at least one reflection field.");
-    return;
-  }
-
-  const reflections = getStoredData(STORAGE_KEYS.REFLECTIONS);
-  const todayStr = new Date().toISOString().split("T")[0];
-
-  // Save or update today's reflection
-  const existingIndex = reflections.findIndex((r) => r.date === todayStr);
-  const entry = { date: todayStr, learned, confused, improve };
-
-  if (existingIndex >= 0) {
-    reflections[existingIndex] = entry;
-  } else {
-    reflections.push(entry);
-  }
-
-  setStoredData(STORAGE_KEYS.REFLECTIONS, reflections);
+  const list = getData(KEYS.reflections).filter((r) => r.date !== today());
+  list.push({ date: today(), learned, confused, improve });
+  setData(KEYS.reflections, list);
 
   const msg = document.getElementById("journalSavedMsg");
   msg.classList.remove("d-none");
-  setTimeout(() => msg.classList.add("d-none"), 3000);
+  setTimeout(() => msg.classList.add("d-none"), 2500);
 }
 
-function loadReflections() {
-  const reflections = getStoredData(STORAGE_KEYS.REFLECTIONS);
-  const todayStr = new Date().toISOString().split("T")[0];
-  const todayRef = reflections.find((r) => r.date === todayStr);
-
-  if (todayRef) {
-    document.getElementById("learnedInput").value = todayRef.learned || "";
-    document.getElementById("confusedInput").value = todayRef.confused || "";
-    document.getElementById("improveInput").value = todayRef.improve || "";
-  }
+function loadReflection() {
+  const item = getData(KEYS.reflections).find((r) => r.date === today());
+  if (!item) return;
+  document.getElementById("learnedInput").value = item.learned || "";
+  document.getElementById("confusedInput").value = item.confused || "";
+  document.getElementById("improveInput").value = item.improve || "";
 }
-// 6. METRICS & ANALYTICS UPDATER
+
+// --- METRICS & ANALYTICS ---
 function updateMetrics() {
-  const sessions = getStoredData(STORAGE_KEYS.SESSIONS);
-  const tasks = getStoredData(STORAGE_KEYS.TASKS);
-  const distractions = getStoredData(STORAGE_KEYS.DISTRACTIONS);
-  const todayStr = new Date().toISOString().split("T")[0];
+  const sessions = getData(KEYS.sessions);
+  const tasks = getData(KEYS.tasks);
+  const distractions = getData(KEYS.distractions);
 
-  // 1. Total Study Time
-  const totalMins = sessions.reduce((acc, s) => acc + (s.duration || 0), 0);
-  const hours = Math.floor(totalMins / 60);
-  const mins = totalMins % 60;
-  document.getElementById("totalStudyTime").textContent = `${hours}h ${mins}m`;
+  const totalMins = sessions.reduce((sum, s) => sum + (s.mins || 0), 0);
+  document.getElementById("totalStudyTime").textContent = `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
 
-  // 2. Focus Efficiency (Calculated dynamically based on today's distractions vs sessions)
-  const todayDistractions = distractions.filter(
-    (d) => d.date === todayStr,
-  ).length;
-  const efficiency = Math.max(35, 100 - todayDistractions * 12);
-  document.getElementById("focusEfficiency").textContent =
-    `${sessions.length > 0 || todayDistractions > 0 ? efficiency : 100}%`;
+  const todayDist = distractions.filter((d) => d.date === today()).length;
+  const eff = Math.max(35, 100 - todayDist * 12);
+  document.getElementById("focusEfficiency").textContent = `${sessions.length || todayDist ? eff : 100}%`;
 
-  // 3. Tasks Left
-  const tasksLeft = tasks.filter((t) => !t.completed).length;
-  document.getElementById("tasksLeft").textContent = tasksLeft;
+  document.getElementById("tasksLeft").textContent = tasks.filter((t) => !t.done).length;
 
-  // 4. Today's Log count
-  const todaySessions = sessions.filter((s) => s.date === todayStr).length;
-  document.getElementById("todayLog").textContent =
-    `${todaySessions} session${todaySessions === 1 ? "" : "s"}`;
+  const todayCount = sessions.filter((s) => s.date === today()).length;
+  document.getElementById("todayLog").textContent = `${todayCount} ${todayCount === 1 ? "session" : "sessions"}`;
 }
 
 function renderAnalytics() {
-  const sessions = getStoredData(STORAGE_KEYS.SESSIONS);
-  const breakdownContainer = document.getElementById("subjectBreakdown");
-  const breakdownEmpty = document.getElementById("breakdownEmpty");
-  const weeklyHeatmap = document.getElementById("weeklyHeatmap");
-  const weeklySummary = document.getElementById("weeklySummary");
+  const sessions = getData(KEYS.sessions);
+  const box = document.getElementById("subjectBreakdown");
+  document.getElementById("breakdownEmpty").classList.toggle("d-none", sessions.length > 0);
 
-  // Subject Breakdown
-  breakdownContainer.innerHTML = "";
-  if (sessions.length === 0) {
-    breakdownEmpty.classList.remove("d-none");
-  } else {
-    breakdownEmpty.classList.add("d-none");
+  const totals = {};
+  sessions.forEach((s) => { totals[s.subject] = (totals[s.subject] || 0) + s.mins; });
+  const maxVal = Math.max(...Object.values(totals), 60);
 
-    // Group by subject
-    const subjectMap = {};
-    sessions.forEach((s) => {
-      subjectMap[s.subject] = (subjectMap[s.subject] || 0) + s.duration;
-    });
+  box.innerHTML = Object.entries(totals).map(([subj, mins]) => `
+    <div class="mb-2">
+      <div class="d-flex justify-content-between small mb-1"><span>${subj}</span><span>${mins}m</span></div>
+      <div class="progress" style="height: 8px;">
+        <div class="progress-bar" style="width: ${Math.round((mins / maxVal) * 100)}%"></div>
+      </div>
+    </div>
+  `).join("");
 
-    const maxMins = Math.max(...Object.values(subjectMap), 60);
+  const heatmap = document.getElementById("weeklyHeatmap");
+  let weekMins = 0;
+  let cells = "";
 
-    for (const [subject, duration] of Object.entries(subjectMap)) {
-      const percent = Math.round((duration / maxMins) * 100);
-      const div = document.createElement("div");
-      div.className = "mb-2";
-      div.innerHTML = `
-                <div class="d-flex justify-content-between small mb-1">
-                    <span>${escapeHTML(subject)}</span>
-                    <span class="text-muted">${duration} mins</span>
-                </div>
-                <div class="progress" style="height: 8px;">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${percent}%"></div>
-                </div>
-            `;
-      breakdownContainer.appendChild(div);
-    }
-  }
-
-  // Weekly Heatmap (Last 7 Days)
-  weeklyHeatmap.innerHTML = "";
-  let weekTotalMins = 0;
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
-    const dayName = d.toLocaleDateString("en-US", { weekday: "narrow" });
+    const key = d.toISOString().split("T")[0];
+    const dayLabel = d.toLocaleDateString("en-US", { weekday: "narrow" });
+    const mins = sessions.filter((s) => s.date === key).reduce((sum, s) => sum + s.mins, 0);
+    weekMins += mins;
 
-    const daySessions = sessions.filter((s) => s.date === dateStr);
-    const dayMins = daySessions.reduce((acc, s) => acc + s.duration, 0);
-    weekTotalMins += dayMins;
-
-    const cell = document.createElement("div");
-    cell.className = "flex-fill text-center p-2 rounded border";
-    let bgClass = "bg-light text-muted";
-    if (dayMins > 60) bgClass = "bg-success text-white";
-    else if (dayMins > 0) bgClass = "bg-info text-dark";
-
-    cell.className += ` ${bgClass}`;
-    cell.innerHTML = `
-            <div class="small fw-bold">${dayName}</div>
-            <div class="small">${dayMins}m</div>
-        `;
-    weeklyHeatmap.appendChild(cell);
+    const color = mins > 60 ? "bg-success text-white" : mins > 0 ? "bg-info text-dark" : "bg-light text-muted";
+    cells += `<div class="flex-fill text-center p-2 rounded border ${color}"><div class="small fw-bold">${dayLabel}</div><div class="small">${mins}m</div></div>`;
   }
 
-  weeklySummary.textContent = `Total studied over the past 7 days: ${Math.floor(weekTotalMins / 60)}h ${weekTotalMins % 60}m. Keep up the consistency!`;
-}
-
-// Utility: Prevent XSS injection when rendering user input
-function escapeHTML(str) {
-  return str.replace(
-    /[&<>'"]/g,
-    (tag) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[
-        tag
-      ] || tag,
-  );
+  heatmap.innerHTML = cells;
+  document.getElementById("weeklySummary").textContent =
+    `Last 7 days total: ${Math.floor(weekMins / 60)}h ${weekMins % 60}m`;
 }
